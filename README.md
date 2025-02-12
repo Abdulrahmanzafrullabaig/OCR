@@ -1,5 +1,3 @@
-Below is a professional and detailed **README.md** file for your OCR and Translation project. This README provides an overview of the project, instructions for setup, usage, and other relevant details.
-
 ---
 
 # OCR and Translation App
