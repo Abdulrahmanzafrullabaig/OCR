@@ -1,4 +1,4 @@
-
+![Image](https://github.com/user-attachments/assets/749ed545-b756-44e0-840d-3890332faa2a)
 ---
 
 # OCR and Translation App
