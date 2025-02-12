@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR & Translation Suite</title>
+    <style>
+        :root {
+            --emerald-50: #ecfdf5;
+            --emerald-100: #d1fae5;
+            --emerald-500: #10b981;
+            --emerald-600: #059669;
+            --emerald-700: #047857;
+            --teal-50: #f0fdfa;
+            --teal-500: #14b8a6;
+            --teal-600: #0d9488;
+            --cyan-50: #ecfeff;
+            --cyan-500: #06b6d4;
+            --cyan-600: #0891b2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--emerald-50), var(--teal-50), var(--cyan-50));
+            color: #1f2937;
+            line-height: 1.5;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .floating-bubble {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .bubble-1 {
+            width: 150px;
+            height: 150px;
+            background-color: var(--emerald-500);
+            top: 10%;
+            left: 10%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .bubble-2 {
+            width: 200px;
+            height: 200px;
+            background-color: var(--teal-500);
+            top: 30%;
+            right: 15%;
+            animation: float 18s infinite ease-in-out reverse;
+        }
+
+        .bubble-3 {
+            width: 100px;
+            height: 100px;
+            background-color: var(--cyan-500);
+            bottom: 20%;
+            left: 20%;
+            animation: float 12s infinite ease-in-out;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--emerald-600), var(--cyan-600));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .title p {
+            color: #4b5563;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--emerald-600);
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px dashed var(--emerald-500);
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        .file-input:hover {
+            border-color: var(--emerald-600);
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 120px;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-area:focus {
+            outline: none;
+            border-color: var(--teal-500);
+        }
+
+        .select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background-color: white;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--emerald-600), var(--cyan-600));
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--emerald-600);
+        }
+
+        .result-container {
+            position: relative;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(10px, -20px); }
+            50% { transform: translate(-10px, -10px); }
+            75% { transform: translate(15px, -30px); }
+        }
+
+        @media (max-width: 640px) {
+            .title h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-bubble bubble-1"></div>
+    <div class="floating-bubble bubble-2"></div>
+    <div class="floating-bubble bubble-3"></div>
+
+    <div class="container">
+        <div class="title">
+            <h1>OCR & Translation Suite</h1>
+            <p>Multi-Language Document Translation</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Document Processing
+            </div>
+            <input type="file" accept="image/*" id="imageUpload" class="file-input">
+            <div id="extractedTextContainer" class="result-container hidden">
+                <p id="extractedText"></p>
+                <button class="btn-copy" onclick="copyText('extractedText')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="translationSection" class="card hidden">
+            <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                Translation Service
+            </div>
+            <textarea id="textInput" class="text-area" placeholder="Enter or modify the text for translation"></textarea>
+            <select id="languageSelect" class="select">
+                <option value="en">English</option>
+                <option value="ja">Japanese (日本語)</option>
+                <option value="de">German (Deutsch)</option>
+                <option value="fr">French (Français)</option>
+                <option value="es">Spanish (Español)</option>
+            </select>
+            <button onclick="translateText()" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-5.5 2-2m-11 11 2-2m0-7-2-2m11 11-2-2"/>
+                </svg>
+                Translate
+            </button>
+            <div id="translatedTextContainer" class="result-container hidden">
+                <p id="translatedText"></p>
+                <button class="btn-copy" onclick="copyText('translatedText')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('imageUpload').addEventListener('change', uploadImage);
+
+        async function uploadImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                
+                const extractedTextElement = document.getElementById('extractedText');
+                extractedTextElement.textContent = data.extracted_text;
+                document.getElementById('extractedTextContainer').classList.remove('hidden');
+                document.getElementById('textInput').value = data.extracted_text;
+                document.getElementById('translationSection').classList.remove('hidden');
+            } catch (error) {
+                alert(error.message || "An error occurred while processing the image");
+            }
+        }
+
+        async function translateText() {
+            const text = document.getElementById('textInput').value;
+            const targetLanguage = document.getElementById('languageSelect').value;
+
+            if (!text.trim()) {
+                alert("Please enter text to translate");
+                return;
+            }
+
+            try {
+                const response = await fetch('/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        target_language: targetLanguage
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                
+                document.getElementById('translatedText').textContent = data.translated_text;
+                document.getElementById('translatedTextContainer').classList.remove('hidden');
+            } catch (error) {
+                alert(error.message || "An error occurred during translation");
+            }
+        }
+
+        async function copyText(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            try {
+                await navigator.clipboard.writeText(text);
+                const button = event.currentTarget;
+                const originalHTML = button.innerHTML;
+                button.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                `;
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                }, 2000);
+            } catch (err) {
+                alert('Failed to copy text to clipboard');
+            }
+        }
+    </script>
+</body>
+</html>

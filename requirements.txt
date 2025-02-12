@@ -1,0 +1,8 @@
+Flask
+easyocr
+requests
+torch
+torchvision
+Pillow
+argostranslate
+numpy
